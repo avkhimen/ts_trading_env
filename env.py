@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy as np
+import gymnasium
 
 class TSEnv():
-    def __init__(self, ts):
+    def __init__(self, ts, obs_dim, action_dim, seed):
         self.ts = ts
-        # obs_dim = env.observation_space.shape[0]
-        # action_dim = env.action_space.n
+        self.seed = seed
+        self.observation_space = np.zeros((obs_dim, ))
+        self.action_space = gymnasium.spaces.Discrete(action_dim, seed=self.seed)
 
     def reset(self, seed=self.seed):
         pass
