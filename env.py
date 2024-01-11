@@ -6,5 +6,9 @@ class TSEnv():
         self.ts = ts
         # obs_dim = env.observation_space.shape[0]
         # action_dim = env.action_space.n
-        # self.env.step(action)
-        # self.env.reset(seed=self.seed)
+
+    def reset(self, seed=self.seed):
+        pass
+    
+    def step(self, action):
+        pass
