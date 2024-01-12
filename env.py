@@ -11,10 +11,15 @@ class TSEnv():
 
     def reset(self):
         seed=self.seed
-        pass
+        state = None
+        return state
     
     def step(self, action):
-        pass
+        next_state = None
+        done = None
+        reward = None
+        info = {}
+        return next_state, reward, done, info
 
 # Test
 env = TSEnv([1,2,3], 3, 2, 32)
