@@ -11,7 +11,8 @@ class TSEnv():
 
     def reset(self):
         seed=self.seed
-        state = None
+        state = None # state = {past prices, past_volumes, past action, ownership status}
+        # state = [price1, price2, vol1, vol2, past action, ownership status]
         return state
     
     def step(self, action):
