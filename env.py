@@ -23,6 +23,9 @@ class TSEnv():
         info = {}
         return next_state, reward, done, info
 
+    def calculate_reward(self):
+        return None
+
 # Test
 env = TSEnv([1,2,3], 3, 2, 32)
 print(env.observation_space)
