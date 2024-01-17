@@ -1,0 +1,4 @@
+The reward is calculated from the next step's price and previous and current ownership status.
+
+The stat consists of prices, volumes, and ownership status. This allows the environment
+to calculate the reward without the time series being part of the environment.
