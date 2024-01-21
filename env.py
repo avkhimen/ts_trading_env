@@ -13,8 +13,15 @@ class TSEnv():
         """Returns the state at the beginning of an episode"""
         seed=self.seed
         state = None # state = {past prices, past_volumes, past action, ownership status}
-        # state = [price1, price2, vol1, vol2, past action, ownership status]
+        # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
+        # actions:
+        # 0 - do nothing
+        # 1 - buy crypto
+        # 2 - sell crypto
+        # ownership status:
+        # 0 - own cash
+        # 1 - own crypto
         return state
     
     def step(self, action):
