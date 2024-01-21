@@ -16,7 +16,7 @@ class TSEnv():
         """Returns the state at the beginning of an episode"""
         seed=self.seed
         ind = random.choice(random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval)))
-        state = [self.ts[ind - self.lookup_interval : ind + period_interval + 1], 0, 0]
+        state = [self.ts[ind - self.lookup_interval : ind + period_interval + 1], 0, 0] #own cash at start
         # state = {past prices, past_volumes, past action, ownership status}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
