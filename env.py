@@ -1,18 +1,23 @@
 import pandas as pd
 import numpy as np
 import gymnasium
+import random
 
 class TSEnv():
-    def __init__(self, ts, obs_dim, action_dim, seed):
-        self.ts = ts
+    def __init__(self, ts, obs_dim, action_dim, seed, lookup_interval, period_interval):
+        self.ts = np.array(ts)
         self.seed = seed
         self.observation_space = np.zeros((obs_dim, ))
         self.action_space = gymnasium.spaces.Discrete(action_dim, seed=self.seed)
+        self.lookup_interval = lookup_interval
+        self.period_interval = period_interval
 
     def reset(self):
         """Returns the state at the beginning of an episode"""
         seed=self.seed
-        state = None # state = {past prices, past_volumes, past action, ownership status}
+        ind = random.choice(random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval)))
+        state = [self.ts[ind - self.lookup_interval : ind + period_interval + 1], 0, 0]
+        # state = {past prices, past_volumes, past action, ownership status}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
         # actions:
