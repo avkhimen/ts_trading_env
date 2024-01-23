@@ -15,8 +15,12 @@ class TSEnv():
     def reset(self):
         """Returns the state at the beginning of an episode"""
         seed=self.seed
-        ind = random.choice(random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval)))
-        state = [self.ts[ind - self.lookup_interval : ind + period_interval + 1], 0, 0] #own cash at start
+        print('--------------------')
+        print(random.choice(range(self.lookup_interval)))
+        print(len(self.ts) - self.period_interval)
+        print('--------------------')
+        ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
+        state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1], 0, 0] #own cash at start
         # state = {past prices, past_volumes, past action, ownership status}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
@@ -42,7 +46,7 @@ class TSEnv():
         return None
 
 # Test
-env = TSEnv([1,2,3], 3, 2, 32)
+env = TSEnv([1,2,3,4,5,6,7,8,9], 3, 2, 32, 3, 3)
 print(env.observation_space)
 print(env.action_space)
 print(env.action_space.sample())
