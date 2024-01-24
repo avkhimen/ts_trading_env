@@ -21,8 +21,9 @@ class TSEnv():
         print('--------------------')
         ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
         price_0 = self.ts[ind - self.lookup_interval]
-        state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1] / price_0, price_0, 1, 0] #own cash at start
-        # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0}
+        step = 0
+        state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1] / price_0, price_0, 1, 0, step] #own cash at start
+        # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
         # actions:
@@ -37,7 +38,8 @@ class TSEnv():
         """Uses action to return next state, reward, done, and info"""
         next_state = None
         done = None
-        reward = None
+        if 
+        reward = self.calculate_reward()
         info = {}
         return next_state, reward, done, info
 
