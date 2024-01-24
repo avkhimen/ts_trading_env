@@ -25,9 +25,8 @@ class TSEnv():
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
         # actions:
-        # 0 - do nothing
-        # 1 - buy crypto
-        # 2 - sell crypto
+        # 0 - buy crypto
+        # 1 - sell crypto
         # ownership status:
         # 0 - own cash
         # 1 - own crypto
