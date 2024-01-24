@@ -20,8 +20,9 @@ class TSEnv():
         print(len(self.ts) - self.period_interval)
         print('--------------------')
         ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
-        state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1], 0, 0] #own cash at start
-        # state = {past prices, past_volumes, past action, ownership status}
+        price_0 = self.ts[ind - self.lookup_interval]
+        state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1] / price_0, price_0, 1, 0] #own cash at start
+        # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
         # actions:
