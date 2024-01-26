@@ -22,7 +22,7 @@ class TSEnv():
         print('--------------------')
         ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
         price_0 = self.ts[ind - self.lookup_interval]
-        step = 0
+        self.step = 0
         state = [self.ts[ind - self.lookup_interval : ind + self.period_interval + 1] / price_0, price_0, 1, 0, step] #own cash at start
         # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
         # state = [price1, price2, past action, ownership status]
@@ -40,13 +40,16 @@ class TSEnv():
         """Uses action to return next state, reward, done, and info.
            The environment must maintain state."""
         next_state = None
-        done = None
-        if 
-        reward = self.calculate_reward()
+        done = False
+        self.step += 1
+        if self.step == self.period_interval:
+            done = True
+        reward = self.calculate_reward(next_state)
         info = {}
+        self.state = next_state
         return next_state, reward, done, info
 
-    def calculate_reward(self):
+    def calculate_reward(self, next_state):
         """Calculates the reward"""
         return None
 
