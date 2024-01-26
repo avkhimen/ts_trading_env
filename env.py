@@ -13,7 +13,8 @@ class TSEnv():
         self.period_interval = period_interval
 
     def reset(self):
-        """Returns the state at the beginning of an episode"""
+        """Returns the state at the beginning of an episode.
+           The environment must maintain state."""
         seed=self.seed
         print('--------------------')
         print(random.choice(range(self.lookup_interval)))
@@ -32,10 +33,12 @@ class TSEnv():
         # ownership status:
         # 0 - own cash
         # 1 - own crypto
+        self.state = state
         return state
     
     def step(self, action):
-        """Uses action to return next state, reward, done, and info"""
+        """Uses action to return next state, reward, done, and info.
+           The environment must maintain state."""
         next_state = None
         done = None
         if 
