@@ -39,15 +39,19 @@ class TSEnv():
     def step(self, action):
         """Uses action to return next state, reward, done, and info.
            The environment must maintain state."""
-        next_state = None
-        done = False
+        next_state = self.get_next_state()
         self.step += 1
+        done = False
         if self.step == self.period_interval:
             done = True
         reward = self.calculate_reward(next_state)
         info = {}
         self.state = next_state
         return next_state, reward, done, info
+
+    def get_next_state(self):
+        next_state = None
+        return next_state
 
     def calculate_reward(self, next_state):
         """Calculates the reward"""
