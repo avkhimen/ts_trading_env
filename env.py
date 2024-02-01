@@ -67,8 +67,10 @@ class TSEnv():
         """Calculates the reward"""
         real_prices = self.state[0] * self.state[1]
         real_price_difference = real_prices[-1] - real_prices[-2]
-        if self.
-        reawrd = None
+        if self.own_status == 0:
+            reward = -(real_price_difference)
+        else:
+            reward = real_price_difference
         return reward
 
 # Test
