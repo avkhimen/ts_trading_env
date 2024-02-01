@@ -22,10 +22,10 @@ class TSEnv():
         print('--------------------')
         self.ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
         self.price_0 = self.ts[self.ind - self.lookup_interval]
-        self.step = 0
+        self.step_ = 0
         self.own_status = 0
         state = [self.ts[self.ind - self.lookup_interval : self.ind \
-                 + self.period_interval + 1] / self.price_0, self.price_0, 1, self.own_status, self.step] #own cash at start
+                 + self.period_interval + 1] / self.price_0, self.price_0, 1, self.own_status, self.step_] #own cash at start
         # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
@@ -44,7 +44,7 @@ class TSEnv():
         reward = self.calculate_reward(action)
         self.next_state = self.get_next_state(action)
         done = False
-        if self.step == self.period_interval:
+        if self.step_ == self.period_interval:
             done = True
         info = {}
         if not done:
@@ -53,14 +53,14 @@ class TSEnv():
 
     def get_next_state(self, action):
         self.ind += 1
-        self.step += 1
+        self.step_ += 1
         self.price_0 = self.ts[self.ind - self.lookup_interval]
         if action == 0:
             self.own_status = 1
         else:
             self.own_status = 0
         self.next_state = [self.ts[self.ind - self.lookup_interval : self.ind \
-                           + self.period_interval + 1] / self.price_0, self.price_0, 1, self.own_status, self.step] #own cash at start
+                           + self.period_interval + 1] / self.price_0, self.price_0, 1, self.own_status, self.step_] #own cash at start
         return self.next_state
 
     def calculate_reward(self, action):
@@ -79,3 +79,5 @@ print(env.observation_space)
 print(env.action_space)
 print(env.action_space.sample())
 print(env.reset())
+print(env.step(1))
+print(env.step(0))
