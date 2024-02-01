@@ -21,10 +21,10 @@ class TSEnv():
         print(len(self.ts) - self.period_interval)
         print('--------------------')
         self.ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
-        price_0 = self.ts[ind - self.lookup_interval]
+        self.price_0 = self.ts[self.ind - self.lookup_interval]
         self.step = 0
         state = [self.ts[self.ind - self.lookup_interval : self.ind \
-                 + self.period_interval + 1] / price_0, price_0, 1, 0, step] #own cash at start
+                 + self.period_interval + 1] / self.price_0, self.price_0, 1, 0, self.step] #own cash at start
         # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
@@ -40,7 +40,7 @@ class TSEnv():
     def step(self, action):
         """Uses action to return next state, reward, done, and info.
            The environment must maintain state."""
-        next_state = self.get_next_state()
+        self.next_state = self.get_next_state()
         self.step += 1
         done = False
         if self.step == self.period_interval:
@@ -49,14 +49,19 @@ class TSEnv():
         info = {}
         if not done:
             self.state = next_state
-        return next_state, reward, done, info
+        return self.next_state, reward, done, info
 
     def get_next_state(self):
-        next_state = None
-        return next_state
+        self.ind += 1
+        self.step += 1
+        self.price_0 = self.ts[self.ind - self.lookup_interval]
+        self.next_state = [self.ts[self.ind - self.lookup_interval : self.ind \
+                           + self.period_interval + 1] / self.price_0, self.price_0, 1, 0, self.step] #own cash at start
+        return self.next_state
 
-    def calculate_reward(self, next_state):
+    def calculate_reward(self):
         """Calculates the reward"""
+        real_prices = self.state[0] * self.state[1]
         reawrd = None
         return reward
 
