@@ -16,10 +16,6 @@ class TSEnv():
         """Returns the state at the beginning of an episode.
            The environment must maintain state."""
         seed=self.seed
-        print('--------------------')
-        print(random.choice(range(self.lookup_interval)))
-        print(len(self.ts) - self.period_interval)
-        print('--------------------')
         self.ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
         self.price_0 = self.ts[self.ind - self.lookup_interval]
         self.step_ = 0
@@ -67,6 +63,12 @@ class TSEnv():
         """Calculates the reward"""
         real_prices = self.state[0] * self.state[1]
         real_price_difference = real_prices[-1] - real_prices[-2]
+        # if own_status = cash = 0:
+        # if price goes up -diff -> stays negative
+        # if price down down -diff -> turns to positive
+        # if own_status = crypto = 1:
+        # if price goes up diff -> stays positive
+        # if price does down diff -> stays negative
         if self.own_status == 0:
             reward = -(real_price_difference)
         else:
@@ -74,10 +76,13 @@ class TSEnv():
         return reward
 
 # Test
-env = TSEnv([1,2,3,4,5,6,7,8,9], 3, 2, 32, 3, 3)
+env = TSEnv([1,2,3,4,5,6,7,8,9], 2, 2, 32, 3, 3)
+env = TSEnv([5,5,5,5,5,5,5,5,5,5], 3, 2, 32, 3, 3)
 print(env.observation_space)
 print(env.action_space)
 print(env.action_space.sample())
 print(env.reset())
+print(env.step(1))
+print(env.step(0))
 print(env.step(1))
 print(env.step(0))
