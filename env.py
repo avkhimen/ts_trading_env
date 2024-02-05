@@ -51,6 +51,9 @@ class TSEnv():
             self.state = self.next_state
         return self.next_state, reward, done, info
 
+    def close(self):
+        return None
+
     def get_next_state(self, action):
         self.ind += 1
         self.step_ += 1
