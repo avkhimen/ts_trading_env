@@ -35,8 +35,10 @@ class TSEnv():
         self.state = state
         self.state = self.state[0].extend([self.state[1], self.state[2], self.state[3]])
         self.state = list(itertools.chain(*self.state))
+        # Must return state as numpy array
         print(self.state)
-        return state
+        info = {}
+        return state, info
     
     def step(self, action):
         """Uses action to return next state, reward, done, and info.
