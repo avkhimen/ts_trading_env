@@ -5,10 +5,13 @@ import random
 import itertools
 
 class TSEnv():
-    def __init__(self, ts, obs_dim, action_dim, seed, lookup_interval, period_interval):
+    def __init__(self, ts, action_dim, lookup_interval, period_interval, seed):
+
+        assert len(ts) > lookup_interval + period_interval, 'time series length should be greater than \
+        the sum of lookup interval and period interval' 
         self.ts = np.array(ts)
         self.seed = seed
-        self.observation_space = np.zeros((obs_dim, ))
+        self.observation_space = np.zeros((lookup_interval + 4, ))
         self.action_space = gymnasium.spaces.Discrete(action_dim, seed=self.seed)
         self.lookup_interval = lookup_interval
         self.period_interval = period_interval
@@ -62,7 +65,7 @@ class TSEnv():
         else:
             self.own_status = 0
         self.next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / self.price_0).tolist()
-        self.next_state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
+        self.next_state.extend([self.price_0, action, self.own_status, self.step_]) #own cash at start
         self.next_state = np.array(self.next_state)
 
         return self.next_state
@@ -83,12 +86,13 @@ class TSEnv():
             reward = real_price_difference
         return reward
 
-# Test
-env = TSEnv(ts=[*range(100)], obs_dim=3, action_dim=2, seed=32, lookup_interval=3, period_interval=3)
-print(env.reset())
-reward_total = 0
-for _ in range(5):
-    next_state, reward, done, _ = env.step(env.action_space.sample())
-    reward_total += reward
+if __name__ == '__main__':
+    # Test
+    env = TSEnv(ts=[*range(1,8)], action_dim=2, lookup_interval=3, period_interval=3, seed=32)
+    print(env.reset())
+    reward_total = 0
+    for _ in range(1):
+        next_state, reward, done, _ = env.step(env.action_space.sample())
+        reward_total += reward
 
-print(reward_total)
+    print(reward_total)
