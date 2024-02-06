@@ -21,8 +21,9 @@ class TSEnv():
         self.price_0 = self.ts[self.ind - self.lookup_interval]
         self.step_ = 0
         self.own_status = 0
-        state = [(self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist(), 
-                 self.price_0, 1, self.own_status, self.step_] #own cash at start
+        #print((self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist())
+        state = (self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist()
+        state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
         # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
         # state = [price1, price2, past action, ownership status]
         # the last price must be the price for time + 1
@@ -32,11 +33,7 @@ class TSEnv():
         # ownership status:
         # 0 - own cash
         # 1 - own crypto
-        self.state = state
-        self.state = self.state[0].extend([self.state[1], self.state[2], self.state[3]])
-        self.state = list(itertools.chain(*self.state))
-        # Must return state as numpy array
-        print(self.state)
+        self.state = np.array(state)
         info = {}
         return state, info
     
@@ -64,10 +61,10 @@ class TSEnv():
             self.own_status = 1
         else:
             self.own_status = 0
-        self.next_state = [(self.ts[self.ind - self.lookup_interval : self.ind + 1] / self.price_0).tolist(), 
-                           self.price_0, 1, self.own_status, self.step_] #own cash at start
-        self.next_state = self.next_state[0].extend([self.next_state[1], self.next_state[2], self.next_state[3]])
-        self.next_state = list(itertools.chain(*self.next_state))
+        self.next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / self.price_0).tolist()
+        self.next_state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
+        self.next_state = np.array(self.next_state)
+
         return self.next_state
 
     def calculate_reward(self, action):
@@ -87,14 +84,11 @@ class TSEnv():
         return reward
 
 # Test
-env = TSEnv([1,2,3,4,5,6,7,8,9], 2, 2, 32, 3, 3)
-env = TSEnv([5,5,5,5,5,5,5,5,5,5], 3, 2, 32, 3, 3)
-env = TSEnv([2,2,2,2,2,2,3,2,1,2,3,2,1,2], 3, 2, 32, 3, 3)
-print(env.observation_space)
-print(env.action_space)
-print(env.action_space.sample())
+env = TSEnv(ts=[*range(100)], obs_dim=3, action_dim=2, seed=32, lookup_interval=3, period_interval=3)
 print(env.reset())
-print(env.step(1))
-print(env.step(0))
-print(env.step(1))
-print(env.step(0))
+reward_total = 0
+for _ in range(5):
+    next_state, reward, done, _ = env.step(env.action_space.sample())
+    reward_total += reward
+
+print(reward_total)
