@@ -24,7 +24,6 @@ class TSEnv():
         self.price_0 = self.ts[self.ind - self.lookup_interval]
         self.step_ = 0
         self.own_status = 0
-        #print((self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist())
         state = (self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist()
         state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
         # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
@@ -38,7 +37,7 @@ class TSEnv():
         # 1 - own crypto
         self.state = np.array(state)
         info = {}
-        return state, info
+        return self.state, info
     
     def step(self, action):
         """Uses action to return next state, reward, done, and info.
@@ -49,9 +48,10 @@ class TSEnv():
         if self.step_ == self.period_interval:
             done = True
         info = {}
+        truncated = False
         if not done:
             self.state = self.next_state
-        return self.next_state, reward, done, info
+        return self.next_state, reward, done, truncated, info
 
     def close(self):
         return None
@@ -90,9 +90,10 @@ if __name__ == '__main__':
     # Test
     env = TSEnv(ts=[*range(1,8)], action_dim=2, lookup_interval=3, period_interval=3, seed=32)
     print(env.reset())
+    print(env.step(env.action_space.sample()))
     reward_total = 0
     for _ in range(1):
-        next_state, reward, done, _ = env.step(env.action_space.sample())
+        next_state, reward, done, truncated, info = env.step(env.action_space.sample())
         reward_total += reward
 
     print(reward_total)
