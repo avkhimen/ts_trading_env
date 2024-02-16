@@ -26,14 +26,14 @@ class TSEnv():
         self.price_0 = self.ts[self.ind - self.lookup_interval]
         self.step_ = 0
         self.own_status = 0
-        state = (self.ts[self.ind - self.lookup_interval : self.ind +   1] / self.price_0).tolist()
+        state = (self.ts[self.ind - self.lookup_interval : self.ind] / self.price_0).tolist()
         state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
-        # state = {past prices, past_volumes, price_0, past action, ownership status, volume_0, step}
-        # state = [price1, price2, past action, ownership status]
+        # state = {past prices, price_0, past action, ownership status, step}
         # the last price must be the price for time + 1
         # actions:
         # 0 - buy crypto
         # 1 - sell crypto
+        # 2 - hold asset
         # ownership status:
         # 0 - own cash
         # 1 - own crypto
