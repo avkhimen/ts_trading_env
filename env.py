@@ -42,30 +42,45 @@ class TSEnv():
         return self.state, info
     
     def step(self, action):
-        """Uses action to return next state, reward, done, and info.
+        """Uses action to return next state, reward, done, truncated, and info.
            The environment must maintain state."""
+           
+        next_state = self.get_next_state(action)
         reward = self.calculate_reward(action)
-        self.next_state = self.get_next_state(action)
+        
+        # calculate done
         done = False
         if self.step_ == self.period_interval:
             done = True
+
+        # calculate info
         info = {}
+
+        # calculate truncate
         truncated = False
-        if not done:
-            self.state = self.next_state
-        return self.next_state, reward, done, truncated, info
+        
+        return next_state, reward, done, truncated, info
 
     def close(self):
         return None
 
     def get_next_state(self, action):
+
+        # Increment ind
         self.ind += 1
+
+        # Increment step_
         self.step_ += 1
+
+        # Get price_0
         self.price_0 = self.ts[self.ind - self.lookup_interval]
+
         if action == 0:
             self.own_status = 1
-        else:
+        elif action == 1:
             self.own_status = 0
+        elif action == 2:
+
         self.next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / self.price_0).tolist()
         self.next_state.extend([self.price_0, action, self.own_status, self.step_]) #own cash at start
         self.next_state = np.array(self.next_state)
@@ -90,11 +105,11 @@ class TSEnv():
 
 if __name__ == '__main__':
     # Test
-    env = TSEnv(ts=[*range(1,8)], action_dim=2, lookup_interval=3, period_interval=3, seed=32)
+    env = TSEnv(ts=[*range(1,80)], action_dim=2, lookup_interval=3, period_interval=3, seed=32)
     print(env.reset())
     print(env.step(env.action_space.sample()))
     reward_total = 0
-    for _ in range(1):
+    for _ in range(10):
         next_state, reward, done, truncated, info = env.step(env.action_space.sample())
         reward_total += reward
 
