@@ -46,7 +46,7 @@ class TSEnv():
            The environment must maintain state."""
 
         next_state = self.get_next_state(action)
-        reward = self.calculate_reward(action)
+        reward = self.calculate_reward(action, next_state)
         
         # calculate done
         done = False
@@ -105,11 +105,11 @@ class TSEnv():
 
         return next_state
 
-    def calculate_reward(self, action):
+    def calculate_reward(self, action, next_state):
         """Calculates the reward"""
 
-        real_prices = np.array(self.state[:-4]) * self.state[-4]
-        real_price_difference = real_prices[-1] - real_prices[-2]
+        scaled_real_prices = np.array(next_state[:-4])
+        scaled_price_difference = scaled_real_prices[-1] - scaled_real_prices[-2]
 
         # if own_status = cash = 0:
         # if price goes up -diff -> stays negative
@@ -117,11 +117,15 @@ class TSEnv():
         # if own_status = crypto = 1:
         # if price goes up diff -> stays positive
         # if price does down diff -> stays negative
+        
+        cash_mult = 1
+        crypto_mult = 2
 
         if self.own_status == 0:
-            reward = -(real_price_difference)
+            reward = -cash_mult * (scaled_price_difference)
+            #reward = 0
         else:
-            reward = real_price_difference
+            reward = crypto_mult * scaled_price_difference
         
         return reward
 
