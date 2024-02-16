@@ -9,11 +9,11 @@ class TSEnv():
     # TODO: correct state to include only stock prices that are known
     def __init__(self, ts, action_dim, lookup_interval, period_interval, seed):
 
-        assert len(ts) > lookup_interval + period_interval, 'time series length should be greater than \
-        the sum of lookup interval and period interval' 
+        assert len(ts) > lookup_interval + period_interval, 'time series length should be greater than ' + \
+                                                            'the sum of lookup interval and period interval' 
         self.ts = np.array(ts)
         self.seed = seed
-        self.observation_space = np.zeros((lookup_interval + 4, ))
+        self.observation_space = np.zeros((lookup_interval + 3, ))
         self.action_space = gymnasium.spaces.Discrete(action_dim, seed=self.seed)
         self.lookup_interval = lookup_interval
         self.period_interval = period_interval
@@ -23,11 +23,11 @@ class TSEnv():
            The environment must maintain state."""
         seed=self.seed
         self.ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
-        self.price_0 = self.ts[self.ind - self.lookup_interval]
+        price_0 = self.ts[self.ind - self.lookup_interval]
         self.step_ = 0
         self.own_status = 0
-        state = (self.ts[self.ind - self.lookup_interval : self.ind] / self.price_0).tolist()
-        state.extend([self.price_0, 1, self.own_status, self.step_]) #own cash at start
+        state = (self.ts[self.ind - self.lookup_interval : self.ind] / price_0).tolist()
+        state.extend([1, self.own_status, self.step_]) #own cash at start
         # state = {past prices, price_0, past action, ownership status, step}
         # the last price must be the price for time + 1
         # actions:
@@ -100,15 +100,16 @@ class TSEnv():
         self.own_status = own_status
 
         next_state = (self.ts[self.ind - self.lookup_interval : self.ind] / price_0).tolist()
-        next_state.extend([price_0, action, self.own_status, self.step_])
+        next_state.extend([action, self.own_status, self.step_])
         next_state = np.array(next_state)
 
         return next_state
 
-    def calculate_reward(self, action, next_state):
+    def calculate_reward(self, action, next_state, cash_mult=1, crypto_mult=2):
         """Calculates the reward"""
 
-        scaled_real_prices = np.array(next_state[:-4])
+        scaled_real_prices = np.array(next_state[:-3])
+        print('step:', self.step_, 'scaled_real_prices', scaled_real_prices)
         scaled_price_difference = scaled_real_prices[-1] - scaled_real_prices[-2]
 
         # if own_status = cash = 0:
@@ -117,12 +118,9 @@ class TSEnv():
         # if own_status = crypto = 1:
         # if price goes up diff -> stays positive
         # if price does down diff -> stays negative
-        
-        cash_mult = 1
-        crypto_mult = 2
 
         if self.own_status == 0:
-            reward = -cash_mult * (scaled_price_difference)
+            reward = -cash_mult * scaled_price_difference
             #reward = 0
         else:
             reward = crypto_mult * scaled_price_difference
@@ -131,12 +129,19 @@ class TSEnv():
 
 if __name__ == '__main__':
     # Test
-    env = TSEnv(ts=[*range(1,80)], action_dim=2, lookup_interval=3, period_interval=3, seed=32)
+    env = TSEnv(ts=[*range(1,20)], action_dim=3, lookup_interval=3, period_interval=10, seed=32)
     print(env.reset())
     print(env.step(env.action_space.sample()))
+
+    def select_action(state):
+        return env.action_space.sample()
+
+    state, info = env.reset()
     reward_total = 0
-    for _ in range(10):
-        next_state, reward, done, truncated, info = env.step(env.action_space.sample())
+    for _ in range(env.period_interval):
+        action = select_action(state)
+        next_state, reward, done, truncated, info = env.step(action)
         reward_total += reward
+        state = next_state
 
     print(reward_total)
