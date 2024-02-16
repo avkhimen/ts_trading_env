@@ -99,7 +99,7 @@ class TSEnv():
 
         self.own_status = own_status
 
-        next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / price_0).tolist()
+        next_state = (self.ts[self.ind - self.lookup_interval : self.ind] / price_0).tolist()
         next_state.extend([price_0, action, self.own_status, self.step_])
         next_state = np.array(next_state)
 
@@ -107,18 +107,22 @@ class TSEnv():
 
     def calculate_reward(self, action):
         """Calculates the reward"""
+
         real_prices = np.array(self.state[:-4]) * self.state[-4]
         real_price_difference = real_prices[-1] - real_prices[-2]
+
         # if own_status = cash = 0:
         # if price goes up -diff -> stays negative
         # if price down down -diff -> turns to positive
         # if own_status = crypto = 1:
         # if price goes up diff -> stays positive
         # if price does down diff -> stays negative
+
         if self.own_status == 0:
             reward = -(real_price_difference)
         else:
             reward = real_price_difference
+        
         return reward
 
 if __name__ == '__main__':
