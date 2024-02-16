@@ -37,14 +37,14 @@ class TSEnv():
         # ownership status:
         # 0 - own cash
         # 1 - own crypto
-        self.state = np.array(state)
+        state = np.array(state)
         info = {}
-        return self.state, info
+        return state, info
     
     def step(self, action):
         """Uses action to return next state, reward, done, truncated, and info.
            The environment must maintain state."""
-           
+
         next_state = self.get_next_state(action)
         reward = self.calculate_reward(action)
         
@@ -73,19 +73,37 @@ class TSEnv():
         self.step_ += 1
 
         # Get price_0
-        self.price_0 = self.ts[self.ind - self.lookup_interval]
+        price_0 = self.ts[self.ind - self.lookup_interval]
 
-        if action == 0:
-            self.own_status = 1
-        elif action == 1:
-            self.own_status = 0
-        elif action == 2:
+        # actions:
+        # 0 - buy crypto
+        # 1 - sell crypto
+        # 2 - hold asset
+        # ownership status:
+        # 0 - own cash
+        # 1 - own crypto
 
-        self.next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / self.price_0).tolist()
-        self.next_state.extend([self.price_0, action, self.own_status, self.step_]) #own cash at start
-        self.next_state = np.array(self.next_state)
+        # Get new own_status
+        if action == 0 and self.own_status == 0:
+            own_status = 1
+        elif action == 0 and self.own_status == 1:
+            own_status = 1
+        elif action == 1 and self.own_status == 0:
+            own_status = 0
+        elif action == 1 and self.own_status == 1:
+            own_status = 0
+        elif action == 2 and self.own_status == 0:
+            own_status = 0
+        elif action == 2 and self.own_status == 1:
+            own_status = 1
 
-        return self.next_state
+        self.own_status = own_status
+
+        next_state = (self.ts[self.ind - self.lookup_interval : self.ind + 1] / price_0).tolist()
+        next_state.extend([price_0, action, self.own_status, self.step_])
+        next_state = np.array(next_state)
+
+        return next_state
 
     def calculate_reward(self, action):
         """Calculates the reward"""
