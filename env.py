@@ -14,7 +14,7 @@ class TSEnv():
         self.ts = np.array(ts)
         self.seed = seed
         self.observation_space = np.zeros((lookup_interval + 3, ))
-        self.action_space = gymnasium.spaces.Discrete(action_dim, seed=self.seed)
+        self.action_space = gymnasium.spaces.Discrete(action_dim)
         self.lookup_interval = lookup_interval
         self.period_interval = period_interval
 
@@ -23,10 +23,12 @@ class TSEnv():
            The environment must maintain state."""
         seed=self.seed
         self.ind = random.choice(range(self.lookup_interval,len(self.ts) - self.period_interval))
-        price_0 = self.ts[self.ind - self.lookup_interval]
+        print('ind is', self.ind)
+        self.price_0 = self.ts[self.ind - self.lookup_interval]
+        print('price_0 is', self.price_0)
         self.step_ = 0
         self.own_status = 0
-        state = (self.ts[self.ind - self.lookup_interval : self.ind] / price_0).tolist()
+        state = (self.ts[self.ind - self.lookup_interval : self.ind] / self.price_0).tolist()
         state.extend([1, self.own_status, self.step_]) #own cash at start
         # state = {past prices, price_0, past action, ownership status, step}
         # the last price must be the price for time + 1
@@ -72,9 +74,6 @@ class TSEnv():
         # Increment step_
         self.step_ += 1
 
-        # Get price_0
-        price_0 = self.ts[self.ind - self.lookup_interval]
-
         # actions:
         # 0 - buy crypto
         # 1 - sell crypto
@@ -99,13 +98,13 @@ class TSEnv():
 
         self.own_status = own_status
 
-        next_state = (self.ts[self.ind - self.lookup_interval : self.ind] / price_0).tolist()
+        next_state = (self.ts[self.ind - self.lookup_interval : self.ind] / self.price_0).tolist()
         next_state.extend([action, self.own_status, self.step_])
         next_state = np.array(next_state)
 
         return next_state
 
-    def calculate_reward(self, action, next_state, cash_mult=1, crypto_mult=2):
+    def calculate_reward(self, action, next_state, cash_mult=1, crypto_mult=1):
         """Calculates the reward"""
 
         scaled_real_prices = np.array(next_state[:-3])
@@ -119,24 +118,26 @@ class TSEnv():
         # if price goes up diff -> stays positive
         # if price does down diff -> stays negative
 
-        if self.own_status == 0:
+        if action == 2:
+            reward = 0
+        elif (self.own_status == 0) and (action != 2):
             reward = -cash_mult * scaled_price_difference
-            #reward = 0
-        else:
+        elif (self.own_status == 1) and (action != 2):
             reward = crypto_mult * scaled_price_difference
         
         return reward
 
 if __name__ == '__main__':
     # Test
-    env = TSEnv(ts=[*range(1,20)], action_dim=3, lookup_interval=3, period_interval=10, seed=32)
-    print(env.reset())
-    print(env.step(env.action_space.sample()))
+    ts = [10,20,30,40,50,60,70]
+    print(ts)
+    env = TSEnv(ts=ts, action_dim=3, lookup_interval=3, period_interval=3, seed=32)
 
     def select_action(state):
         return env.action_space.sample()
 
     state, info = env.reset()
+    print('state after reset is', state)
     reward_total = 0
     for _ in range(env.period_interval):
         action = select_action(state)
