@@ -5,8 +5,6 @@ import random
 import itertools
 
 class TSEnv():
-    # TODO: change actions to buy, sell, hold
-    # TODO: correct state to include only stock prices that are known
     def __init__(self, ts, action_dim, lookup_interval, period_interval, seed):
 
         assert len(ts) > lookup_interval + period_interval, 'time series length should be greater than ' + \
