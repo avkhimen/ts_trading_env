@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import gymnasium
+import gymnasium as gym
 import random
 import itertools
 
@@ -12,7 +12,7 @@ class TSEnv():
         self.ts = np.array(ts)
         self.seed = seed
         self.observation_space = np.zeros((lookup_interval + 3, ))
-        self.action_space = gymnasium.spaces.Discrete(action_dim)
+        self.action_space = gym.spaces.Discrete(action_dim)
         self.lookup_interval = lookup_interval
         self.period_interval = period_interval
 
